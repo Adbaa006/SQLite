@@ -54,6 +54,7 @@ def rediger_vare():
         1. Navn: {navn}
         2. Pris: {pris}
         3. Antall: {ant}
+        "q" for å avslutte
         """)
         inn = input(": ")
         if inn == "1":
@@ -74,14 +75,10 @@ while inn != "q":
     2. Slett vare
     3. Selge vare
     4. Rediger vare
+    5. Vise rapport
     "q" for å avslutte
           """)
     inn = input(": ")
-    #match inn:
-    #   case "1":
-    #       legge_til_vare()
-    #   case "2":
-    #       slett_vare()
     if inn == "1":
         legge_til_vare()
     elif inn == "2":
@@ -93,12 +90,15 @@ while inn != "q":
     
 
 # Vise varelager
-c.execute("SELECT * FROM inventar")
+# c.execute("SELECT * FROM inventar")
 # Vise salg
-c.execute("SELECT * FROM salg")
-
-
-
-print(c.fetchall())
+# c.execute("SELECT * FROM salg")
+# print(c.fetchall())
+# For Python 3.10
+#match inn:
+    #   case "1":
+    #       legge_til_vare()
+    #   case "2":
+    #       slett_vare()
 
 databasekobling.close()

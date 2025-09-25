@@ -1,4 +1,5 @@
-import sqlite3, datetime
+import sqlite3
+from datetime import date
 
 databasekobling = sqlite3.connect("butikk.db")
 c = databasekobling.cursor()
@@ -75,7 +76,16 @@ def selge_vare():
     else:
         vare_id = inn
         inn = input("Skriv antall: ")
-    
+        antall_solgt = int(inn)
+        total_sum = rad[2] * antall_solgt
+        nytt_antall = rad[3] - antall_solgt
+        c.execute("UPDATE inventar SET antall = ? WHERE id = ?", (nytt_antall, vare_id))
+        dato = date.today()
+        c.execute("""
+            INSERT INTO salg (vare_id, antall, dato)
+            VALUES (?, ?, ?)
+        """, (vare_id, antall_solgt, dato))
+        databasekobling.commit()
 
 inn = ""
 

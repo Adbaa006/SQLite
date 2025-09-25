@@ -1,7 +1,8 @@
-import sqlite3
+import sqlite3, datetime
 
 databasekobling = sqlite3.connect("butikk.db")
 c = databasekobling.cursor()
+c.execute("PRAGMA foreign_keys = ON")
 
 c.execute("""
     CREATE TABLE IF NOT EXISTS inventar(
@@ -13,11 +14,12 @@ c.execute("""
 """)
 c.execute("""
     CREATE TABLE IF NOT EXISTS salg(
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          vare_id INTEGER,
-          dato REAL NOT NULL,
-          antall INTEGER NOT NULL
-          )
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        vare_id INTEGER,
+        antall INTEGER NOT NULL,
+        dato TEXT,
+        FOREIGN KEY (vare_id) REFERENCES inventar(id)
+        )
 """)
 
 def legge_til_vare():
@@ -30,13 +32,6 @@ def legge_til_vare():
 def slett_vare():
     vare_id = input("Skriv ID-en til varen som skal slettes: ")
     c.execute("DELETE FROM inventar WHERE id = ?", (vare_id))
-    databasekobling.commit()
-
-def selge_vare():
-    vare_id = input("Skriv inn ID-en til varen som skal selges: ")
-    dato = input("Skriv inn dato salget blir gjort: ")
-    antall_salg = input("Skriv inn antall som blir solgt: ")
-    c.execute("INSERT INTO salg (vare_id, dato, antall) VALUES(?,?,?)", (vare_id, dato, antall_salg))
     databasekobling.commit()
 
 def rediger_vare():
@@ -66,6 +61,22 @@ def rediger_vare():
     c.execute("UPDATE inventar SET navn = ?, pris = ?, antall = ? WHERE id = ?", (navn, pris, ant, vare_id))
     databasekobling.commit()
 
+def selge_vare():
+    c.execute("SELECT * FROM inventar")
+    resultat = c.fetchall()
+    for vare in resultat:
+        print(f"{vare[0]}. {vare[1]} - {vare[2]} kr - {vare[3]} stk")
+    inn = input("Skriv inn ID-en til varen som skal selges: ")
+    c.execute("SELECT * FROM inventar WHERE id = ?", (inn))
+    rad = c.fetchone()
+    vare_id = ""
+    if rad is None:
+        print(f"Fant ingen vare med ID: {inn}")
+    else:
+        vare_id = inn
+        inn = input("Skriv antall: ")
+    
+
 inn = ""
 
 while inn != "q":
@@ -73,8 +84,8 @@ while inn != "q":
     MENY
     1. Legg til vare
     2. Slett vare
-    3. Selge vare
-    4. Rediger vare
+    3. Rediger vare
+    4. Selge vare
     5. Vise rapport
     "q" for å avslutte
           """)
@@ -84,9 +95,10 @@ while inn != "q":
     elif inn == "2":
         slett_vare()
     elif inn == "3":
-        selge_vare()
-    elif inn == "4":
         rediger_vare()
+    elif inn == "4":
+        selge_vare()
+    
     
 
 # Vise varelager
@@ -100,5 +112,11 @@ while inn != "q":
     #       legge_til_vare()
     #   case "2":
     #       slett_vare()
-
+"""def selge_vare():
+    vare_id = input("Skriv inn ID-en til varen som skal selges: ")
+    dato = input("Skriv inn dato salget blir gjort: ")
+    antall_salg = input("Skriv inn antall som blir solgt: ")
+    c.execute("INSERT INTO salg (vare_id, dato, antall) VALUES(?,?,?)", (vare_id, dato, antall_salg))
+    databasekobling.commit()
+"""
 databasekobling.close()

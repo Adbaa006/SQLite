@@ -28,8 +28,41 @@ def legge_til_vare():
     databasekobling.commit()
 
 def slett_vare():
-    vare_id = input("Skriv id til varen som skal slettes: ")
+    vare_id = input("Skriv ID-en til varen som skal slettes: ")
     c.execute("DELETE FROM inventar WHERE id = ?", (vare_id))
+    databasekobling.commit()
+
+def selge_vare():
+    vare_id = input("Skriv inn ID-en til varen som skal selges: ")
+    dato = input("Skriv inn dato salget blir gjort: ")
+    antall_salg = input("Skriv inn antall som blir solgt: ")
+    c.execute("INSERT INTO salg (vare_id, dato, antall) VALUES(?,?,?)", (vare_id, dato, antall_salg))
+    databasekobling.commit()
+
+def rediger_vare():
+    vare_id = input("Skriv ID-en til varen som skal endres: ")
+    c.execute("SELECT * FROM inventar WHERE id = ?", (vare_id))
+    resultat = c.fetchone()
+    inn = ""
+    navn = resultat[1]
+    pris = resultat[2]
+    ant = resultat[3]
+
+    while inn != "q":
+        print(f"""
+        Hva vil du redigere?
+        1. Navn: {navn}
+        2. Pris: {pris}
+        3. Antall: {ant}
+        """)
+        inn = input(": ")
+        if inn == "1":
+            navn = input("Skriv inn nytt navn: ")
+        elif inn == "2":
+            pris = input("Skriv inn ny pris: ")
+        elif inn == "3":
+            ant = input("Skriv inn nytt antall: ")
+    c.execute("UPDATE inventar SET navn = ?, pris = ?, antall = ? WHERE id = ?", (navn, pris, ant, vare_id))
     databasekobling.commit()
 
 inn = ""
@@ -39,22 +72,26 @@ while inn != "q":
     MENY
     1. Legg til vare
     2. Slett vare
+    3. Selge vare
+    4. Rediger vare
+    "q" for å avslutte
           """)
     inn = input(": ")
-    match inn:
-        case "1":
-            legge_til_vare()
-        case "2":
-            slett_vare()
+    #match inn:
+    #   case "1":
+    #       legge_til_vare()
+    #   case "2":
+    #       slett_vare()
+    if inn == "1":
+        legge_til_vare()
+    elif inn == "2":
+        slett_vare()
+    elif inn == "3":
+        selge_vare()
+    elif inn == "4":
+        rediger_vare()
     
 
-
-# Selge bøker
-vare_id = input("Skriv inn ID-en til boken som skal selges: ")
-dato = input("Skriv inn dato salget blir gjort: ")
-antall_salg = input("Skriv inn antall som blir solgt: ")
-
-c.execute("INSERT INTO salg (vare_id, dato, antall) VALUES(?,?,?)", (vare_id, dato, antall_salg))
 # Vise varelager
 c.execute("SELECT * FROM inventar")
 # Vise salg

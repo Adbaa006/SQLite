@@ -87,6 +87,9 @@ def selge_vare():
         """, (vare_id, antall_solgt, dato))
         databasekobling.commit()
 
+def vise_varelager():
+    c.execute("SELECT * FROM inventar")
+
 inn = ""
 
 while inn != "q":
@@ -108,6 +111,8 @@ while inn != "q":
         rediger_vare()
     elif inn == "4":
         selge_vare()
+    elif inn == "5":
+        vise_varelager()
     
     
 
